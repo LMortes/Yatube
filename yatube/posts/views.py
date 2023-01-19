@@ -36,13 +36,14 @@ def profile(request, username):
     author = get_object_or_404(User, username=username)
     post_list = Post.objects.filter(author=author)
     page_obj = pg_views(request, post_list, settings.COUNT_POSTS)
-    following = request.user.is_authenticated
-    if following:
+    if request.user.is_authenticated:
         following = author.following.filter(user=request.user).exists()
+    else:
+        following = request.user.is_authenticated
     context = {
         'author': author,
         'page_obj': page_obj,
-        'following': following
+        'following': following,
     }
     return render(request, template, context)
 
@@ -56,7 +57,6 @@ def post_detail(request, post_id):
     context = {
         'post': post,
         'posts_count': posts_count,
-        'requser': request.user,
         'comments': comments,
         'form': form,
     }
